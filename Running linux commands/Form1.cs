@@ -38,14 +38,16 @@ namespace Running_linux_commands
         }
         public void RunCommand()
         {
+            label5.Text = null;
+
             try
             {
                 SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
                 sshclient.Connect();
-                SshCommand command = sshclient.RunCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./build-key --batch USER.NAME");
+                SshCommand command = sshclient.CreateCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./build-key --batch " + textBox5.Text);
                 command.Execute();
 
-                label5.Text = command.Result;
+                label5.Text = "Сертификат " + textBox5.Text + " создан.";
             }
             catch (Exception e)
             {
@@ -72,7 +74,6 @@ namespace Running_linux_commands
         {
 
         }
-
         private void textBox5_TextChanged(object sender, EventArgs e)
         {
 
@@ -100,6 +101,7 @@ namespace Running_linux_commands
 
         private void button2_Click(object sender, EventArgs e)
         {
+
             RunCommand();
         }
 
@@ -107,7 +109,6 @@ namespace Running_linux_commands
         {
 
         }
-
         private void button1_Click(object sender, EventArgs e)
         {
             SaveData();
