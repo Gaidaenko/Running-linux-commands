@@ -42,7 +42,7 @@ namespace Running_linux_commands
             {
                 SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
                 sshclient.Connect();
-                SshCommand command = sshclient.RunCommand(textBox5.Text);
+                SshCommand command = sshclient.RunCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./build-key --batch USER.NAME");
                 command.Execute();
 
                 label5.Text = command.Result;
