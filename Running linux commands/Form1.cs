@@ -18,7 +18,7 @@ namespace Running_linux_commands
         public string userName;
         public string password;
         public string host;
-        public int port;
+        public int port;       
 
         public Form1()
         {
@@ -36,9 +36,11 @@ namespace Running_linux_commands
             Settings.Default.Password = textBox4.Text;
             Settings.Default.Save();
         }
+
         public void RunCommand()
         {
             label5.Text = null;
+            string textBox = textBox5.Text;
 
             try
             {
@@ -53,6 +55,17 @@ namespace Running_linux_commands
             {
                 label5.Text = "Не удалось установить соединение с сервером!";
             }
+        }
+
+        public void CreateArchiveCert()
+        {
+            SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
+            sshclient.Connect();
+            SshCommand command = sshclient.CreateCommand("mkdir /tmp/"+textBox5.Text +" && cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text +".crt " + "/tmp/" + textBox5.Text + " && " +
+                                   "cp /etc/openvpn/easy-rsa/keys/"+ textBox5.Text + ".key /tmp/"+ textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"+ textBox5.Text +" &&" +
+                                   " cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/"+ textBox5.Text + " && cd /tmp/"+ textBox5.Text + " && tar cvf /tmp/"+ textBox5.Text + ".tar * && rm -fr /tmp/"+ textBox5.Text);
+            command.Execute();
+            
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -78,12 +91,10 @@ namespace Running_linux_commands
         {
 
         }
-
         private void label1_Click(object sender, EventArgs e)
         {
 
         }
-
         private void label2_Click(object sender, EventArgs e)
         {
 
@@ -104,7 +115,6 @@ namespace Running_linux_commands
 
             RunCommand();
         }
-
         private void label5_Click(object sender, EventArgs e)
         {
 
@@ -112,6 +122,10 @@ namespace Running_linux_commands
         private void button1_Click(object sender, EventArgs e)
         {
             SaveData();
+        }
+        private void button3_Click(object sender, EventArgs e)
+        {
+            CreateArchiveCert();
         }
     }
 }
