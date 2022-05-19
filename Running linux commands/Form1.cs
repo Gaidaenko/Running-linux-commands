@@ -62,9 +62,9 @@ namespace Running_linux_commands
             SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
             sshclient.Connect();
             SshCommand command = sshclient.CreateCommand("mkdir /tmp/"+textBox5.Text +" && cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text +".crt " + "/tmp/" 
-                + textBox5.Text + " && " + "cp /etc/openvpn/easy-rsa/keys/"+ textBox5.Text + ".key /tmp/"+ textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"
-                + textBox5.Text +" &&" +" cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/"+ textBox5.Text + " && cd /tmp/"+ textBox5.Text + " && tar cvf /tmp/"
-                + textBox5.Text + ".tar * && rm -fr /tmp/"+ textBox5.Text);
+            + textBox5.Text + " && " + "cp /etc/openvpn/easy-rsa/keys/"+ textBox5.Text + ".key /tmp/"+ textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"
+            + textBox5.Text +" &&" +" cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/"+ textBox5.Text + " && cd /tmp/"+ textBox5.Text + " && tar cvf /tmp/"
+            + textBox5.Text + ".tar * && rm -fr /tmp/"+ textBox5.Text);
             command.Execute();
             
         }
