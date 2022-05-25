@@ -1,14 +1,13 @@
 ﻿using Renci.SshNet;
 using Running_linux_commands.Properties;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+
 using System.Windows.Forms;
 
 namespace Running_linux_commands
@@ -18,7 +17,7 @@ namespace Running_linux_commands
         public string userName;
         public string password;
         public string host;
-        public int port;       
+        public int port;
 
         public Form1()
         {
@@ -37,10 +36,9 @@ namespace Running_linux_commands
             Settings.Default.Save();
         }
 
-        public void RunCommand()
+        public void CreateCert()
         {
-            label5.Text = null;
-            string textBox = textBox5.Text;
+            label5.Text = null;  
 
             try
             {
@@ -48,49 +46,75 @@ namespace Running_linux_commands
                 sshclient.Connect();
                 SshCommand command = sshclient.CreateCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./build-key --batch " + textBox5.Text);
                 command.Execute();
-
-                label5.Text = "Сертификат " + textBox5.Text + " создан.";
+                sshclient.Disconnect();
             }
             catch (Exception e)
             {
                 label5.Text = "Не удалось установить соединение с сервером!";
             }
+
+            CreateArchiveCert();
         }
 
         public void CreateArchiveCert()
         {
-            SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
-            sshclient.Connect();
-            SshCommand command = sshclient.CreateCommand("mkdir /tmp/"+textBox5.Text +" && cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text +".crt " + "/tmp/" 
-            + textBox5.Text + " && " + "cp /etc/openvpn/easy-rsa/keys/"+ textBox5.Text + ".key /tmp/"+ textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"
-            + textBox5.Text +" &&" +" cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/"+ textBox5.Text + " && cd /tmp/"+ textBox5.Text + " && tar cvf /tmp/"
-            + textBox5.Text + ".tar * && rm -fr /tmp/"+ textBox5.Text);
-            command.Execute();
-            
+            label5.Text = null;
+
+            try
+            {
+                SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
+                sshclient.Connect();
+                SshCommand command = sshclient.CreateCommand("mkdir /tmp/" + textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text + ".crt " + "/tmp/"
+                + textBox5.Text + " && " + "cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text + ".key /tmp/" + textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"
+                + textBox5.Text + " &&" + " cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/" + textBox5.Text + " && cd /tmp/" + textBox5.Text + " && tar cvf /tmp/"
+                + textBox5.Text + ".tar * && rm -fr /tmp/" + textBox5.Text);
+                command.Execute();
+                sshclient.Disconnect();
+
+                label5.Text = "Сертификат и ключ " + textBox5.Text + " созданы. Архив расположен по пути: /tmp";
+            }
+            catch (Exception e)
+            {
+                label5.Text = "Не удалось установить соединение с сервером!";
+            }            
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        public void SendMail()
         {
-
+            try
+            {
+                SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
+                sshclient.Connect();
+                SshCommand command = sshclient.CreateCommand($"echo \"Архив {textBox5.Text} во вложении. \" | mail -s " +
+                                                             $"\"Создан сертификат OpenVPN для {textBox5.Text}\" -A /tmp/" + textBox5.Text + ".tar " + textBox6.Text);
+                command.Execute();
+                sshclient.Disconnect();
+            }
+            catch
+            {
+                label5.Text = "Не удалось установить соединение с сервером!";
+            }
         }
-
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
-
+            SaveData();
         }
-
-        private void textBox3_TextChanged(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
-
+            CreateCert();
         }
-
-        private void textBox4_TextChanged(object sender, EventArgs e)
+        private void button3_Click(object sender, EventArgs e)
         {
+            if (!textBox6.Text.Contains("@") || !textBox6.Text.Contains(""))
+            {
+                label5.Text = "Строка не содержит електронный адрес!";
+                return;
+            }
 
-        }
-        private void textBox5_TextChanged(object sender, EventArgs e)
-        {
+            Thread thired = new Thread(SendMail);
+            thired.Start();
 
+            label5.Text = "Сертификат и ключ " + textBox5.Text + " отправлены на почту: " + textBox6.Text + ". Ожидайте!";
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -100,33 +124,41 @@ namespace Running_linux_commands
         {
 
         }
-
         private void label3_Click(object sender, EventArgs e)
         {
 
         }
-
         private void label4_Click(object sender, EventArgs e)
         {
 
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-
-            RunCommand();
         }
         private void label5_Click(object sender, EventArgs e)
         {
 
         }
-        private void button1_Click(object sender, EventArgs e)
+        private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            SaveData();
+
         }
-        private void button3_Click(object sender, EventArgs e)
+        private void textBox2_TextChanged(object sender, EventArgs e)
         {
-            CreateArchiveCert();
+
+        }
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
