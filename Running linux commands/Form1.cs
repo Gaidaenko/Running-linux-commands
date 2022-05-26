@@ -95,6 +95,24 @@ namespace Running_linux_commands
                 label5.Text = "Не удалось установить соединение с сервером!";
             }
         }
+        public void RevokeCert()
+        {
+            try
+            {
+                SshClient sshclient = new SshClient(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text, textBox4.Text);
+                sshclient.Connect();
+                SshCommand command = sshclient.CreateCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./revoke-full " + textBox5.Text);
+                command.Execute();
+                sshclient.Disconnect();
+
+                label5.Text = "Сертификат " + textBox5.Text + " отозван!";
+            }
+            catch
+            {
+                label5.Text = "Не удалось установить соединение с сервером!";
+            }
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             SaveData();
@@ -115,6 +133,10 @@ namespace Running_linux_commands
             thired.Start();
 
             label5.Text = "Сертификат и ключ " + textBox5.Text + " отправлены на почту: " + textBox6.Text + ". Ожидайте!";
+        }
+        private void button4_Click(object sender, EventArgs e)
+        {
+            RevokeCert();
         }
         private void label1_Click(object sender, EventArgs e)
         {
