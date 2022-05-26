@@ -47,6 +47,7 @@ namespace Running_linux_commands
                 SshCommand command = sshclient.CreateCommand("cd /etc/openvpn/easy-rsa/ && source ./vars && ./build-key --batch " + textBox5.Text);
                 command.Execute();
                 sshclient.Disconnect();
+                
             }
             catch (Exception e)
             {
@@ -67,11 +68,9 @@ namespace Running_linux_commands
                 SshCommand command = sshclient.CreateCommand("mkdir /tmp/" + textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text + ".crt " + "/tmp/"
                 + textBox5.Text + " && " + "cp /etc/openvpn/easy-rsa/keys/" + textBox5.Text + ".key /tmp/" + textBox5.Text + " && cp /etc/openvpn/easy-rsa/keys/ta.key /tmp/"
                 + textBox5.Text + " &&" + " cp /etc/openvpn/easy-rsa/keys/ca.crt /tmp/" + textBox5.Text + " && cd /tmp/" + textBox5.Text + " && tar cvf /tmp/"
-                + textBox5.Text + ".tar * && rm -fr /tmp/" + textBox5.Text);
-                command.Execute();
+                + textBox5.Text + ".tar * && rm -fr /tmp/" + textBox5.Text);               
+                label5.Text = command.Execute() + "\n" + "Сертификат и ключ пользователя " + textBox5.Text + " созданы. Архив расположен по пути: /tmp";
                 sshclient.Disconnect();
-
-                label5.Text = "Сертификат и ключ " + textBox5.Text + " созданы. Архив расположен по пути: /tmp";
             }
             catch (Exception e)
             {
